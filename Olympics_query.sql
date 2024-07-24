@@ -31,18 +31,18 @@ select * from OLYMPICS_HISTORY_NOC_REGIONS;
 
 
 ### Question#####
---1:How many olympics games have been held?
+--Q1:How many olympics games have been held?
 	
 select count(distinct games) as total_Olympics_games 
 from olympics_history
 
---2: List down all Olympics games held so far?
+--Q2: List down all Olympics games held so far?
 
 select distinct year,season,city
 from olympics_history
 order by year
 
---3:Mention the total no of nations who participated in each olympics game?
+--Q3:Mention the total no of nations who participated in each olympics game?
 
 SELECT 
     oh.year, 
@@ -60,7 +60,7 @@ ORDER BY
     oh.season;
 
 
---4:Which year saw the highest and lowest no of countries participating in olympics?
+--Q4:Which year saw the highest and lowest no of countries participating in olympics?
 
 -- higest no of countries
 select oh.year,oh.season,
@@ -80,7 +80,7 @@ group by oh.year,oh.season
 order by higest_countries 
 limit 1;
 
--- 5: Which nation has participated in all of the olympic games
+-- Q5: Which nation has participated in all of the olympic games
 
 -- Step 1: Find the total number of unique Olympic Games
 with unique_games as(
@@ -126,7 +126,7 @@ from olympics_history
 group by sport
 having count(distinct games)=1;
  
---8:-Fetch the total no of sports played in each olympic games.
+--Q8:-Fetch the total no of sports played in each olympic games.
 
 
 select games,count(distinct sport) as total_no_of_sport 
@@ -134,7 +134,7 @@ from olympics_history
 group by games
 
 
---9:-Fetch details of the oldest athletes to win a gold medal.
+--Q9:-Fetch details of the oldest athletes to win a gold medal.
 
 with oldest_gold_medalist as (
 	select max(age) as max_age
@@ -147,36 +147,7 @@ from olympics_history
 where medal='Gold' and age=(select max_age from oldest_gold_medalist)
 order by age desc;
 
-
---10:-Find the Ratio of male and female athletes participated in all olympic games.
-
-with unique_games as(
-	select distinct games
-	from olympics_history
-),
-athlete_participation as(
-	select id,name,sex, 
-	count(distinct games) as participation_count
-	from olympics_history
-	group by id,name,sex
-),
-athletes_in_all_games as(
-	select ap.id,ap.name,ap.sex
-	from athlete_participation as ap
-	where ap.participation_count=(select count(*) from unique_games)
- ),
-
-sex_count as(
-	select sex, count(*) as count
-	from athletes_in_all_games 
-	group by sex
-	)
-
-SELECT
-    (SELECT COUNT(*) FROM sex_count WHERE Sex = 'M')::float /
-    (SELECT COUNT(*) FROM sex_count WHERE Sex = 'F')::float AS male_to_female_ratio;
-
---11:-Fetch the top 5 athletes who have won the most gold medals?
+--Q10:-Fetch the top 5 athletes who have won the most gold medals?
 
 
 select name,team,count(*) as gold_medal_count
@@ -186,7 +157,7 @@ group by name,team
 order by gold_medal_count desc
 limit 5;
 
---12:-Fetch the top 5 athletes who have won the most medals (gold/silver/bronze).
+--Q11:-Fetch the top 5 athletes who have won the most medals (gold/silver/bronze).
 
 
 select name,team,count(*) as total_count
@@ -197,7 +168,7 @@ order by total_count desc
 limit 5;
 
 
---13. Fetch the top 5 most successful countries in olympics.Success is defined by no of medals won?
+--Q12. Fetch the top 5 most successful countries in olympics.Success is defined by no of medals won?
 
 select nr.region,count(1) as total_medals
 from olympics_history as oh
@@ -207,7 +178,7 @@ group by nr.region
 order by total_medals desc
 limit 5;
 
---14. List down total gold, silver and bronze medals won by each country.
+--Q13. List down total gold, silver and bronze medals won by each country.
 
 
 create extension tablefunc;
@@ -230,7 +201,7 @@ order by gold desc,silver desc,bronze desc;
 
 
 
---15. List down total gold, silver and bronze medals won by each country corresponding to each olympic games.
+--Q14. List down total gold, silver and bronze medals won by each country corresponding to each olympic games.
 
 
 
@@ -252,7 +223,7 @@ SELECT substring(games,1,position(' - ' in games) - 1) as games
 
 
 
---17. Which countries have never won gold medal but have won silver/bronze medals?
+--Q15. Which countries have never won gold medal but have won silver/bronze medals?
 
 select * from(
 	select country
@@ -273,7 +244,7 @@ select * from(
     order by gold desc nulls last, silver desc nulls last, bronze desc nulls last;
 
 
---18:-In which Sport/event, India has won highest medals.
+--Q16:-In which Sport/event, India has won highest medals.
 
 select sport,count(1) as total_medal
 from olympics_history
@@ -283,7 +254,7 @@ order by total_medal desc
 limit 1;
 
 
---19:- Break down all olympic games where India won medal for Hockey and how many medals in each olympic games
+--Q17:- Break down all olympic games where India won medal for Hockey and how many medals in each olympic games
 
 select team,sport,games,count(1) as total_medal
 from olympics_history
@@ -292,7 +263,7 @@ group by team,sport,games
 order by total_medal desc;
 
 
---20:- In which Sport/event, India athletes won the top 5 most medals in and ,how many medals have they won in each sport.
+--Q18:- In which Sport/event, India athletes won the top 5 most medals in and ,how many medals have they won in each sport.
 
 select sport,count(1) as total_medal
 from olympics_history
